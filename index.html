@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>타이머 웹페이지</title>
+    <link rel="stylesheet" href="gowun-dodum.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div id="seating-chart">
+            <h2 style="color:#f7cac9; font-size:2rem; margin:18px 0 10px 0; text-align:center;">3학년 4반 자리배치도</h2>
+            <div class="seating-grid">
+                <!-- 가로 6줄 자리배치: JS로 생성 -->
+            </div>
+            <div style="text-align:center; margin-top:18px;">
+                <button id="shuffleBtn" style="font-size:1.1rem; padding:10px 28px; border-radius:14px; background:#a3cef1; color:#4078c0; border:none; font-family:'Gowun Dodum', 'Segoe UI', Arial, sans-serif; font-weight:bold; box-shadow:0 2px 8px #e0eafc; cursor:pointer; transition:background 0.2s;">🔀 자리 섞기</button>
+            </div>
+            <script>
+            // 자리배치 랜덤 생성 함수
+            function renderSeating() {
+                const girls = Array.from({length:13}, (_,i)=>({type:'girl', label:`${i+1}번`}));
+                const boys = Array.from({length:16}, (_,i)=>({type:'boy', label:`${i+14}번`}));
+                function shuffle(arr) {
+                    for(let i=arr.length-1;i>0;i--){
+                        const j=Math.floor(Math.random()*(i+1));
+                        [arr[i],arr[j]]=[arr[j],arr[i]];
+                    }
+                }
+                // 전체 학생 랜덤 섞기
+                const students = girls.concat(boys);
+                shuffle(students);
+                // 6열로 나누기: 1~5열 5명, 6열 4명
+                const cols = [5,5,5,5,5,4];
+                let idx = 0;
+                let columns = [];
+                for(let i=0;i<6;i++){
+                    columns.push(students.slice(idx, idx+cols[i]));
+                    idx += cols[i];
+                }
+                const grid = document.querySelector('.seating-grid');
+                grid.innerHTML = '';
+                // 열별로 세로로 배치
+                const table = document.createElement('div');
+                table.style.display = 'flex';
+                table.style.justifyContent = 'center';
+                table.style.gap = '32px';
+                for(let c=0;c<6;c++){
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'column-group';
+                    const colTitle = document.createElement('div');
+                    colTitle.className = 'column-title';
+                    colTitle.textContent = `${c+1}열`;
+                    colDiv.appendChild(colTitle);
+                    columns[c].forEach(s=>{
+                        const div = document.createElement('div');
+                        div.className = `seat ${s.type}`;
+                        div.innerHTML = (s.type==='girl'? '👧':'👦')+"<br>"+s.label;
+                        colDiv.appendChild(div);
+                    });
+                    table.appendChild(colDiv);
+                }
+                grid.appendChild(table);
+            }
+            renderSeating();
+            document.getElementById('shuffleBtn').onclick = renderSeating;
+            </script>
+        </div>
+    </div>
+    <script src="timer.js"></script>
+</body>
+</html>
